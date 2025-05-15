@@ -21,13 +21,13 @@ Run the tool with data or a file to visualize xHCI structures.
 - **Bytes (default)**: Space-separated bytes - Little Endian
 
   ```
-  python main.py 03 00 07 04 08
+  python main.py 0xa3 0x9d 0xb5 0x3e 0x70 0xc0 0xd2 0xc1 0x81 0x87 0x19 0x9f 0x47 0xd0 0x8b 0x69 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
   ```
 
 - **32-bit Words**: Use `--word` flag  - Little Endian
 
   ```
-  python main.py --word 03000704 08000000
+  python main.py --word 0x3eb59da3 0xc1d2c070 0x9f198781 0x698bd047 0x00000000 0x00000000 0x00000000 0x00000000
   ```
 
 - **File Input**: Use `--file` flag (add `--word` if 32-bit words)  
@@ -41,7 +41,7 @@ Run the tool with data or a file to visualize xHCI structures.
 - **Direct Structure**: Specify structure with `--struct`  
 
   ```
-  python main.py --struct <codename> 03 00 07 04 08
+  python main.py --struct <codename> 0xa3 0x9d 0xb5 0x3e 0x70 0xc0 0xd2 0xc1 0x81 0x87 0x19 0x9f 0x47 0xd0 0x8b 0x69 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
   ```
   See [Supported Data Structure](#supported-data-structures) for the codename to use
 
@@ -52,10 +52,15 @@ Run the tool with data or a file to visualize xHCI structures.
 - Save visualization: Use `--save` flag  
 
   ```
-  python main.py 03 00 07 04 08 --save output.png
+  python main.py --word 0x3eb59da3 0xc1d2c070 0x9f198781 0x698bd047 0x00000000 0x00000000 0x00000000 0x00000000 --save output.png
+  ```
+- Render visualization: Use `--render` flag
+
+  ```
+  python main.py 0x3eb59da3 0xc1d2c070 0x9f198781 0x698bd047 0x00000000 0x00000000 0x00000000 0x00000000  --word  --render
   ```
 
-- **Default outpu**t**: Saved as `xhci-Ds.png` if `--save` not specified.
+- **Default output**t**: Saved as `xhci-Ds.png` if `--save` not specified.
 
 ## Supported Data Structures
 
@@ -72,6 +77,7 @@ Run the tool with data or a file to visualize xHCI structures.
 | `--file`        |  File Name/Path  | Tells the tool to pickup content from a file name which precedes this flag.|
 | `--struct`      |  Struct CodeName | Informs the tool that it needs to visualize one of the Structures. The structure codenames can be found in the section [Supported Data Structures](#supported-data-structures) |
 | `--save`        |   **filename**   | Tells the tool to save the visualization as **filename**.png               |
+| `--render`      |        N/A       | Tells the tool to save the render the created file                         |
 
 ## Defaults
 
