@@ -81,4 +81,4 @@ Run the tool with data or a file to visualize xHCI structures.
 |Prompt User for DataStruct | By default, the tool prompts the user if he/she wants to decode a particular data structure unless told using `--struct` flag      |
 |     Read as bytes         | By default assumes data is in 8-bit wide byte segments separated by spaces. Can be told its in 32-bit form using `--word` flag     |
 |    Reads from STDIN       | Assumes data is being passed from STDIN, unless filename is passed using `--file` flag.                                            |
-|    Little Endian System   | Always assumes data is in little endian format                                                                                     |
+|    Little Endian System   | Always assumes data is in little endian format and is stored on memory in 32-bit word form                                         |
