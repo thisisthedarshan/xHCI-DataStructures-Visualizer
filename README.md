@@ -79,13 +79,14 @@ Run the tool with data or a file to visualize xHCI structures.
 | `--file`        |  File Name/Path  | Tells the tool to pickup content from a file name which precedes this flag.|
 | `--struct`      |  Struct CodeName | Informs the tool that it needs to visualize one of the Structures. The structure codenames can be found in the section [Supported Data Structures](#supported-data-structures) |
 | `--save`        |   **filename**   | Tells the tool to save the visualization as **filename**.png               |
-| `--render`      |        N/A       | Tells the tool to save the render the created file                         |
+| `--render`      |        N/A       | Tells the tool to render the created file                                  |
+| `--render`      |        N/A       | Tells the tool save as a PDF instead of a png                              |
 
 ## Defaults
 
 |  Default Value/behavior   |                                                          Explanation                                                               |
 |---------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-|      `xhci-Ds.png`        | The visualized file is saved with this default value unless filename is passed with `--save` flag                                  |
+|      `xhci-Ds.png`        | The visualized file is saved as png with this default value unless filename is passed with `--save` flag (or `--pdf` is passed to save as pdf instead of png. The filename will still be used!) |
 |Prompt User for DataStruct | By default, the tool prompts the user if he/she wants to decode a particular data structure unless told using `--struct` flag      |
 |     Read as bytes         | By default assumes data is in 8-bit wide byte segments separated by spaces. Can be told its in 32-bit form using `--word` flag     |
 |    Reads from STDIN       | Assumes data is being passed from STDIN, unless filename is passed using `--file` flag.                                            |
