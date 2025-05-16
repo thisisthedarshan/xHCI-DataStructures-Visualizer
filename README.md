@@ -66,7 +66,10 @@ Run the tool with data or a file to visualize xHCI structures.
 
 | Type of Structure                     |   codename   |
 ----------------------------------------|--------------|
+| Device Context Data Structure         |  `devctx`    |
+| Input Context Data Structure          |  `ipctx`     |
 | Slot Context                          |  `slotctx`   |
+| Endpoint Context                      |  `endpctx`   |
 
 ## Flags and their usages
 

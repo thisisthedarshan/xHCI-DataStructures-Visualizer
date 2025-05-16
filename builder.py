@@ -7,9 +7,9 @@
 # build the final output.
 
 from graphviz import Digraph
-from builders.constants import VisualizationException, supportedStructures
-from builders.content import slotContext
-from builders.details import slotContextDetails
+from builders.constants import VisualizationException, createInfoTable, supportedStructures
+from builders.content import *
+from builders.details import *
 from random import randint as unique
 
 def buildSlotContext(byteData:list[int]) -> Digraph:
@@ -17,7 +17,7 @@ def buildSlotContext(byteData:list[int]) -> Digraph:
   This function builds visualization for slot context data structure
   '''
   # Check if data is properly available
-  if len( byteData) < 16:
+  if len(byteData) < 16:
     raise VisualizationException(f"Expecting at-least 16 bytes of data. Got {len(byteData)} bytes")
   
   # Get base data
@@ -25,27 +25,37 @@ def buildSlotContext(byteData:list[int]) -> Digraph:
   slotDescription = slotContextDetails(byteData)
   
   # Create a rect and add this data
-  table = f"""<
-  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="1">
-    <TR> <TD COLSPAN="36"><B> SLOT CONTEXT </B></TD></TR>
-    <TR> 
-         <TD> {slotDiagram} </TD> 
-    </TR>
-    <TR > <TD HEIGHT="21"></TD> </TR>
-    <TR> <TD COLSPAN="12">DESCRIPTION</TD> </TR>
-    <TR> 
-         <TD> {slotDescription} </TD> 
-    </TR>
-  </TABLE>
->
-"""
+  table = createInfoTable("Slot Context",slotDiagram, slotDescription)
+  
   # We have the table, build a Digraph item from it.
   dot = Digraph()
   dot.clear()
-  dot.node(f"Slot Context # {unique(69,420)}",table,shape='none')
+  dot.node(f"Slot Context #{unique(69,420)}",table,shape='none')
   return dot
   
 
+def buildEndpointContext(byteData:list[int], endpointNumber:int=-1) -> Digraph:
+  '''
+  This function takes in raw bytes, decodes it and creates a visualization of 
+  endpoint context data structure. Endpoint number = -1 indicates that we don't know which
+  endpoint this data belongs to!
+  '''
+  
+  if len(byteData) < 20: # 4 bytes per row *5 rows since remaining are 0
+    raise VisualizationException(f"Expecting at-least 16 bytes of data. Got {len(byteData)} bytes")
+
+  # Get the content
+  endpointDiagram = endpointContext(byteData)
+  endpointDescription = endpointContextDetails(byteData)
+  
+  # Create a rect and add this data
+  table = createInfoTable(f"Endpoint {endpointNumber if (endpointNumber!= -1) else ''} Context",endpointDiagram, endpointDescription)
+  
+  # We have the table, build a Digraph item from it.
+  dot = Digraph()
+  dot.clear()
+  dot.node(f"Endpoint Context {endpointNumber if (endpointNumber!= -1) else ''} #{unique(69,420)}",table,shape='none')
+  return dot
 
 def createStandaloneDS(byteData:list[int], struct:str) -> Digraph:
   '''
@@ -56,6 +66,8 @@ def createStandaloneDS(byteData:list[int], struct:str) -> Digraph:
   match (struct.strip().lower()):
     case "slotctx":
       return buildSlotContext(byteData)
+    case "endpctx":
+      return buildEndpointContext(byteData)
     case _:
       raise VisualizationException(f"Invalid Data Structure codename {struct}")
 

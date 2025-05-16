@@ -11,13 +11,37 @@ class VisualizationException(Exception):
 
 
 # Define widths for codename and description for better looks in help message
-codenameWidth = 11
+codenameWidth = 12
 descriptionWidth = 24
 # This holds the list of supported data structures for the tool
 supportedStructures:dict[str, str] = {
-    "slotctx "    : "Slot Context"
+    "slotctx "    : "Slot Context",
+    "endpctx "    : "Endpoint Context",
+    "devctx "     : "Device Context",
+    "ipctx "      : "Input Context",
 }
 
+# This function returns a data structure and its description graph item by
+# using them on a template
+def createInfoTable(structureName:str, dataStructure:str, description:str) -> str:
+  '''
+  This function returns a formatted (templated) data-structure + description as a string.
+  This function was created since the template remained the same across all functions.
+  '''
+  return f"""<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="1">
+    <TR > <TD HEIGHT="21"><br></br></TD> </TR>
+    <TR> <TD COLSPAN="36"><B> {structureName} </B></TD></TR>
+    <TR> 
+         <TD> {dataStructure} </TD> 
+    </TR>
+    <TR > <TD HEIGHT="21"><br></br></TD> </TR>
+    <TR> <TD COLSPAN="12">DESCRIPTION</TD> </TR>
+    <TR> 
+         <TD> {description} </TD> 
+    </TR>
+  </TABLE>
+>"""
 
 def RsvdZ(numberOfBits:int = 8) -> str:
   '''This function returns 0's to represent Reserved Zero Default values'''
@@ -33,31 +57,49 @@ def mapRouteString(routeBytes:list[int]) -> list[int]:
 
 def mapTTThinkTime(bit2ttThinkTime:int) -> str :
   '''This function maps a 2-bit think time value to respective description'''
-  ttThinkTimeDescription:str = "Invalid Input Given"
-  match bit2ttThinkTime:
-    case 0:
-      ttThinkTimeDescription = "TT requires at most 8 FS bit times of inter-transaction gap on a full-/low-speed downstream bus."
-    case 1:
-      ttThinkTimeDescription = "TT requires at most 16 FS bit times."
-    case 2:
-      ttThinkTimeDescription = "TT requires at most 24 FS bit times."
-    case 3:
-      ttThinkTimeDescription = "TT requires at most 32 FS bit times."
-  
-  return ttThinkTimeDescription
+  ttThinkTimeMap = {
+    0 : "TT requires at most 8 FS bit times of inter-transaction gap on a full-/low-speed downstream bus.",
+    1 : "TT requires at most 16 FS bit times.",
+    2 : "TT requires at most 24 FS bit times.",
+    3 : "TT requires at most 32 FS bit times."
+  }
+  return ttThinkTimeMap.get(bit2ttThinkTime, "Invalid Input Given")
 
 def mapSlotState(bit5SlotStateCode:int) -> str:
   ''' This function maps a 5-bit slot state to string equivalent'''
-  slotState:str = "Reserved"
-  match bit5SlotStateCode:
-    case 0:
-      slotState = "Disabled/Enabled State"
-    case 1:
-      slotState = "Default State"
-    case 2:
-      slotState = "Addressed State"
-    case 3:
-      slotState = "Configured State"
-      
-  return slotState
+  slotStates = {
+    0 : "Disabled/Enabled State",
+    1 : "Default State",
+    2 :"Addressed State",
+    3 :"Configured State"
+  }
+  
+  return slotStates.get(bit5SlotStateCode,"Reserved")
+
+def mapEndpointState(bit3EpState:int) -> str:
+  '''This function maps a 3-bit endpoint state code to respective string'''
+  endpointStateMap = {
+    0 : "Disabled",
+    1 : "Running",
+    2 : "Halted",
+    3 : "Stopped",
+    4 : "Error"
+  }
+  
+  return endpointStateMap.get(bit3EpState,"Reserved")
+
+def mapEPType(bit3EpTypeCode:int) -> str:
+  '''This function maps a 3-bit endpoint code to respective type and direction string'''
+  epTypeMap = {
+    1 : "Isoch Out",
+    2 : "Bulk Out",
+    3 : "Interrupt Out",
+    4 : "Control - Bidirectional",
+    5 : "Isoch In",
+    6 : "Bulk In",
+    7 : "Interrupt In",
+  }
+  
+  return epTypeMap.get(bit3EpTypeCode, "Invalid Type!")
+
 

@@ -7,7 +7,7 @@
 # the data structure's content represents - meaning of fields/values
 # and significances based on the data structure.
 
-from builders.constants import mapRouteString, mapSlotState, mapTTThinkTime
+from builders.constants import *
 
 
 def slotContextDetails(data:list[int]) -> str:
@@ -106,3 +106,100 @@ def slotContextDetails(data:list[int]) -> str:
         </tr>
     </table>
   '''
+
+def endpointContextDetails(data:list[int]) ->str:
+    '''This function describes info details of the endpoint from the endpoint context data'''
+    
+    # First, separate out the data
+    
+    # Row 1
+    endpointState = mapEndpointState((data[3]&0x7))
+    mult = f"LEC Depended. If LEC = 0, then Max Number of Bursts = {(data[2] & 0x3)+1}. Else, Reserved"
+    maxPStreams = "Streams not supported or Endpoint Type is SS Control, Isoch, Interrupt, or not a SuperSpeed endpoint." if ((data[2] >> 2) & 0x3F) == 0 else f"Primary Stream Array Contains {2**(((data[2] >> 2) & 0x3F)+1)} entries. Width = {(((data[2] >> 2) & 0x3F)+1)}"
+    linearStreamArray = "Reserved" if ((data[2] >> 2) & 0x3F) == 0 else "Stream ID = index into Primary Stream Array. Secondary Stream Arrays disabled. MaxPStreams: 1–15." if(data[1] & 0x01) == 1 else f"Stream ID split: low {(((data[2] >> 2) & 0x3F)+1)} → Primary, high bits → Secondary Stream Array. MaxPStreams: 1–7."
+    interval = (data[1] >> 1) & 0x7F
+    maxESITPayloadHi = data[0]
+    
+    # Row 2
+    errorCount = "Unlimited retries; no bus error counting." if (((data[7]>>1)&0x3) == 0) else "Allow CErr failures before halting. On final error, endpoint halts and error event is generated."
+    epType = mapEPType((data[7]>>3)&0x7)
+    hostInitiateDisable = "Host-initiated Stream selection is disabled; device controls Stream transitions." if ((data[7]>>7)&0x01) == 1 else "Host-initiated Stream selection is enabled; normal Stream operation."
+    maxBurstSize = data[6]+1
+    maxPacketSize = data[5]+(data[4]<<8)
+    
+    # Row 3 & 4
+    dcs = data[11]&0x01
+    trDequeuePtr = hex((int.from_bytes(data[8:16],'little'))>>4)
+    
+    # Row 5
+    avgTRBLength = data[19] + (data[18]<<8)
+    maxESITPayloadLo = data[17]+ (data[16]<<8)
+    
+    # Then create and return useful data as a table
+    return f"""
+    <table border="1" cellborder="1" cellspacing="0" cellpadding="4">
+        <tr>
+            <td> Endpoint State </td>
+            <td> {endpointState} </td>
+        </tr>
+        <tr>
+            <td> Mult </td>
+            <td> {mult} </td>
+        </tr>
+        <tr>
+            <td> Max Primary Streams </td>
+            <td> {maxPStreams} </td>
+        </tr>
+        <tr>
+            <td> Linear Stream Array </td>
+            <td> {linearStreamArray} </td>
+        </tr>
+        <tr>
+            <td> Interval. </td>
+            <td> {interval} </td>
+        </tr>
+        <tr>
+            <td> Max Endpoint Service Time Interval Payload High </td>
+            <td> {maxESITPayloadHi} </td>
+        </tr>
+        <tr>
+            <td> Error Count </td>
+            <td> {errorCount} </td>
+        </tr>
+        <tr>
+            <td> Endpoint Type </td>
+            <td> {epType} </td>
+        </tr>
+        <tr>
+            <td> Host Initiate Disable </td>
+            <td> {hostInitiateDisable} </td>
+        </tr>
+        <tr>
+            <td> Max Burst Size </td>
+            <td> {maxBurstSize} </td>
+        </tr>
+        <tr>
+            <td> Max Packet Size </td>
+            <td> {maxPacketSize} </td>
+        </tr>
+        <tr>
+            <td> Dequeue Cycle State </td>
+            <td> {dcs} </td>
+        </tr>
+        <tr>
+            <td> TR Dequeue Pointer </td>
+            <td> {trDequeuePtr} </td>
+        </tr>
+        <tr>
+            <td> Average TRB Length </td>
+            <td> {avgTRBLength} </td>
+        </tr>
+        <tr>
+            <td> Max Endpoint Service Time Interval Payload Low </td>
+            <td> {maxESITPayloadLo} </td>
+        </tr>
+        
+    </table>
+
+"""
+
