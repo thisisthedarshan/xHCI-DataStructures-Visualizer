@@ -91,6 +91,14 @@ Run the tool with data or a file to visualize xHCI structures.
 |    Reads from STDIN       | Assumes data is being passed from STDIN, unless filename is passed using `--file` flag.                                            |
 |    Little Endian System   | Always assumes data is in little endian format and is stored on memory in 32-bit word form                                         |
 
+> [!NOTE]
+> By default, the input byte order (*not word*) is assumed to be a result of decoding on a big endian system.
+> What this means is that if your system is 32-bit and is storing the value `0x12345678`, when exported in bytes,
+> you'll get: `0x78 0x56 0x34 0x12`. This is the way the tool interprets the input sequence as well!
+> When looking from byte perspective, you might feel like its big endian (which is kinda true...) but tool will later take care of this later!
+> When you give 32-bit word data to the tool, it will automatically decode the data as shown in above example.
+> That's why the tool is assume the system to be as Little Endian!
+
 ### Watermark
 
 Font used is [Anta](https://fonts.google.com/specimen/Anta), Designed by Sergej Lebedev, released under [SIL Open Font License, Version 1.1 .](https://openfontlicense.org/open-font-license-official-text/)
