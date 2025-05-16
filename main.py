@@ -13,7 +13,7 @@ import textwrap
 from graphviz import Digraph
 
 from builder import processAndBuildData
-from helpers import addWatermark, convert32BitToLEBytesArray
+from helpers import addWatermark, convert32BitToBytesArray
 from builders.constants import supportedStructures, codenameWidth, descriptionWidth
 
 def xHCIDataStructureVisualizer():
@@ -111,7 +111,7 @@ Supported Structures are:
    
    # Process Data to obtain final byte-wise data
    rawDataInt = [int(data,16) for data in rawDataIn]
-   rawBytesData:list[int] = convert32BitToLEBytesArray(rawDataInt) if (args.word) else rawDataInt
+   rawBytesData:list[int] = convert32BitToBytesArray(rawDataInt) if (args.word) else rawDataInt
 
    # Check if user has given a struct name. If not, prompt him/her to do so
    struct = args.struct

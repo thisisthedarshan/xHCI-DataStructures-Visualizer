@@ -7,7 +7,7 @@
 
 from PIL import Image, ImageFont, ImageDraw
 
-def convert32BitToLEBytesArray(dataIn32BitForm:list[int]) -> list[int]:
+def convert32BitToBytesArray(dataIn32BitForm:list[int]) -> list[int]:
   '''This function Converts 32-bit int array to an array of bytes'''
   result:list[int] = []
   for bit32Value in dataIn32BitForm:
@@ -20,7 +20,9 @@ def bytes2binList(dataBytesList:list[int]) -> list[int]:
     '''This function takes in a list of bytes (Little Endian format) and creates 32-bit binary list and returns it'''
     rows:list[int] = []
     for i in range(0,len(dataBytesList),4):
-        row = int.from_bytes(dataBytesList[i:i+4], "little")
+        intBytes = dataBytesList[i:i+4]
+        row = int.from_bytes(intBytes) # Here, the byteList is in Big-Endian order since we re-arrange it
+        print(row)
         rows.append(row)
     
     # We have the values. Split them in binary list items

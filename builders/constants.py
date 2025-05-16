@@ -50,9 +50,9 @@ def RsvdZ(numberOfBits:int = 8) -> str:
 def mapRouteString(routeBytes:list[int]) -> list[int]:
   ''' This function maps a list of 3-bytes to a 20-bit route list'''
   return [
-    (routeBytes[3] & 0xF), ((routeBytes[3]>>4) & 0xF),
-    (routeBytes[2] & 0xF), ((routeBytes[2]>>4) & 0xF),
-    (routeBytes[1] & 0xF)
+    (routeBytes[1] & 0xF), ((routeBytes[2]>>4) & 0xF),
+    (routeBytes[2] & 0xF), ((routeBytes[3]>>4) & 0xF),
+    (routeBytes[3] & 0xF)
     ]
 
 def mapTTThinkTime(bit2ttThinkTime:int) -> str :
