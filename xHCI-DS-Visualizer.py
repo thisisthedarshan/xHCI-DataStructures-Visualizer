@@ -52,9 +52,9 @@ def xHCIDataStructureVisualizer():
 
    ### Example
    ```bash
-   python3 main.py 03 00 07 04 08 --save output.png  # Bytes, saves as output.png
-   python3 main.py --word 03000704 08000000  # 32-bit words, saves as xhci-Ds.png
-   python3 main.py --file data.txt --struct devctx  # File input, Device Context
+   python3 xHCI-DS-Visualizer.py 03 00 07 04 08 --save output.png  # Bytes, saves as output.png
+   python3 xHCI-DS-Visualizer.py --word 03000704 08000000  # 32-bit words, saves as xhci-Ds.png
+   python3 xHCI-DS-Visualizer.py --file data.txt --struct devctx  # File input, Device Context
    ```
    '''
    # Create an info message containing supported data structures
