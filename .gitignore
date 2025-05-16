@@ -142,6 +142,7 @@ cython_debug/
 # Tool Generated files
 *.png
 *.svg
+*.pdf
 xHCI-DS
 
 # Misc. Files
