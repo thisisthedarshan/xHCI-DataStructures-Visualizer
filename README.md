@@ -64,10 +64,12 @@ Run the tool with data or a file to visualize xHCI structures.
 
 ## Supported Data Structures
 
-| Type of Structure                     | codename |
-----------------------------------------|----------|
-| Device Context Data Structure         | `devctx` |
-| Input Context Data Strcuture          | `ipctx`  |
+| Type of Structure                     |   codename   |
+----------------------------------------|--------------|
+| Device Context Data Structure         |  `devctx`    |
+| Input Context Data Structure          |  `ipctx`     |
+| Slot Context                          |  `slotctx`   |
+| Endpoint Context                      |  `endpctx`   |
 
 ## Flags and their usages
 
@@ -88,3 +90,7 @@ Run the tool with data or a file to visualize xHCI structures.
 |     Read as bytes         | By default assumes data is in 8-bit wide byte segments separated by spaces. Can be told its in 32-bit form using `--word` flag     |
 |    Reads from STDIN       | Assumes data is being passed from STDIN, unless filename is passed using `--file` flag.                                            |
 |    Little Endian System   | Always assumes data is in little endian format and is stored on memory in 32-bit word form                                         |
+
+### Watermark
+
+Font used is [Anta](https://fonts.google.com/specimen/Anta), Designed by Sergej Lebedev, released under [SIL Open Font License, Version 1.1 .](https://openfontlicense.org/open-font-license-official-text/)
