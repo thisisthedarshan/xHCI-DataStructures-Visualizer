@@ -81,6 +81,7 @@ Supported Structures are:
 |___________|_________________________|
 """))
    parser.add_argument("--word", action="store_true", help="Input is of type 32-bit words")
+   parser.add_argument("--pdf", action="store_true", help="Export as PDF instead of PNG")
    parser.add_argument("data", nargs="*", help="Input data (space/comma-separated)")
    
    args = parser.parse_args()
@@ -141,19 +142,20 @@ Supported Structures are:
    dot.clear()
    dot = processAndBuildData(struct,rawBytesData)
    
-   # Process to add a watermark :)
-   # dot.edge("head", "Watermark",style='invis')
-   # dot.node("Watermark","""<
-   #          <table BORDER='0'>
-   #             <tr>
-   #                <td align="left" colspan="55"> Made with xHCI-DataStructures-Visualizer          </td>
-   #                <td colspan="45">   <br></br> </td>
-   #                <td align="right"> github.com/thisisthedarshan/xHCI-DataStructures-Visualizer    </td>
-   #             </tr>
-   #          </table>
-   #          >""",shape='none')
-   dot.render(fileName,format='png',view=args.render,cleanup=False)
-   addWatermark(fileName+".png")
+   if args.pdf:
+      # Process to add a watermark :)
+      dot.edge("head", "Watermark",style='invis')
+      dot.node("Watermark","""<
+               <table BORDER='0'>
+                  <tr>
+                     <td HREF="https://github.com/thisisthedarshan/xHCI-DataStructures-Visualizer" TARGET="_blank"> Made with xHCI-DataStructures-Visualizer :D </td>
+                  </tr>
+               </table>
+               >""",shape='none')
+      dot.render(fileName,format='pdf',view=args.render,cleanup=True)
+   else:
+      dot.render(fileName,format='png',view=args.render,cleanup=True)
+      addWatermark(fileName+".png")
   
 if __name__ == "__main__":
   xHCIDataStructureVisualizer()
