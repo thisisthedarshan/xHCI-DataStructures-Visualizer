@@ -139,5 +139,10 @@ cython_debug/
 # VSCode files
 .vscode/
 
-# Tool Generated png files
+# Tool Generated files
 *.png
+*.svg
+xHCI-DS
+
+# Misc. Files
+*.txt
