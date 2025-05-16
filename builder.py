@@ -10,9 +10,12 @@ from graphviz import Digraph
 from builders.constants import VisualizationException, createInfoTable, supportedStructures
 from builders.content import *
 from builders.details import *
-from random import randint as unique
 
-def buildSlotContext(byteData:list[int]) -> Digraph:
+
+#########################################################################################
+# The following functions contain builders for individual data structures
+#########################################################################################
+def buildSlotContext(byteData:list[int], name:list[str] = []) -> str:
   '''
   This function builds visualization for slot context data structure
   '''
@@ -24,17 +27,9 @@ def buildSlotContext(byteData:list[int]) -> Digraph:
   slotDiagram = slotContext(byteData)
   slotDescription = slotContextDetails(byteData)
   
-  # Create a rect and add this data
-  table = createInfoTable("Slot Context",slotDiagram, slotDescription)
-  
-  # We have the table, build a Digraph item from it.
-  dot = Digraph()
-  dot.clear()
-  dot.node(f"Slot Context #{unique(69,420)}",table,shape='none')
-  return dot
-  
+  return createInfoTable("Slot Context",slotDiagram, slotDescription)
 
-def buildEndpointContext(byteData:list[int], endpointNumber:int=-1) -> Digraph:
+def buildEndpointContext(byteData:list[int], endpointType:str = "", name:list[str] = []) -> str:
   '''
   This function takes in raw bytes, decodes it and creates a visualization of 
   endpoint context data structure. Endpoint number = -1 indicates that we don't know which
@@ -48,30 +43,86 @@ def buildEndpointContext(byteData:list[int], endpointNumber:int=-1) -> Digraph:
   endpointDiagram = endpointContext(byteData)
   endpointDescription = endpointContextDetails(byteData)
   
-  # Create a rect and add this data
-  table = createInfoTable(f"Endpoint {endpointNumber if (endpointNumber!= -1) else ''} Context",endpointDiagram, endpointDescription)
+  return createInfoTable(f"Endpoint {endpointType}Context",endpointDiagram, endpointDescription)
+
+
+#########################################################################################
+# The following functions contain logic for building chained/grouped data structures 
+# containing more than 1 data structure
+#########################################################################################
+
+def buildDeviceContext(byteData:list[int]) -> Digraph:
+  '''
+  This function takes in raw data, processes it and builds a complex visualization of the 
+  device context data structure.
+  '''
   
-  # We have the table, build a Digraph item from it.
+  # Ensure that there are at-least 1024 elements in the byte array.
+  # This is because Slot Context takes 32 bytes
+  # Endpoint contexts take (32 endpoints) * 32 bytes each = 992
+  if len(byteData) < 1024:
+    raise VisualizationException(f"Device Context expects al-least 1024 bytes as input. Got {len(byteData)} bytes instead")
+  
+  # First split into slot data segment and endpoints data segment
+  slotSegment:list[int] = byteData[:32] # 4 bytes per row * 8 rows
+  endpointSegments:list[int] = byteData[32:] # Remaining Bytes will be for endpoint context
+  
+  # Create digraph item
   dot = Digraph()
   dot.clear()
-  dot.node(f"Endpoint Context {endpointNumber if (endpointNumber!= -1) else ''} #{unique(69,420)}",table,shape='none')
+  
+  # Create a list to hold unique object names so that we can use it in mapping of contexts in graph
+  name:list[str] = []
+  
+  # Build Slot Context
+  slotContext = buildSlotContext(slotSegment,name)
+  
+  name.append(f"head")
+  
+  dot.node(name[-1],slotContext, shape='none')
+  
+  # Build The Endpoint Contexts
+  for endpointNumber in range(31):
+    if endpointNumber == 0:
+      # This is a bi-directional endpoint
+      endpointType = "0 - Bi-Directional "
+    else:
+      endpointType = f"{(endpointNumber//2)+(endpointNumber % 2)} {"- OUT" if endpointNumber % 2 == 1 else "- IN"} "
+    
+    name.append(f"Endpoint Context {endpointType}")
+    endpointSegment = endpointSegments[(endpointNumber*32) : (endpointNumber+1)*32]
+    dot.node(name[-1],buildEndpointContext(endpointSegment,endpointType,name), shape='none')
+
+  for i in range(len(name)-1):
+    dot.edge(name[i], name[i+1])
+      
   return dot
+
+#########################################################################################
+# The following functions contain logic to decode inputs and call appropriate builders
+#########################################################################################
 
 def createStandaloneDS(byteData:list[int], struct:str) -> Digraph:
   '''
   This function helps visualize individual data structures instead of
   grouped data structures
   '''
-  print(struct.lower())
+  content = ""
   match (struct.strip().lower()):
     case "slotctx":
-      return buildSlotContext(byteData)
+      content =  buildSlotContext(byteData)
     case "endpctx":
-      return buildEndpointContext(byteData)
+      content =  buildEndpointContext(byteData)
     case _:
       raise VisualizationException(f"Invalid Data Structure codename {struct}")
 
-
+  # Create a Digraph and add this standalone data structure
+  dot = Digraph()
+  dot.clear()
+  
+  dot.node(f"head",content,shape='none')
+  return dot
+  
 def createDeviceContextDS(byteData:list[int]) -> str:
   '''
   This function takes in raw data and returns a GraphViz object representing
@@ -95,7 +146,7 @@ def processAndBuildData(struct:str, byteData:list[int]) -> Digraph:
   result = ""
   match struct:
     case "devctx":
-      pass
+      return buildDeviceContext(byteData)
     case "ipctx":
       pass
     case _:

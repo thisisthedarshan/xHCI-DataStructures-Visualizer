@@ -101,9 +101,7 @@ Supported Structures are:
       rawDataIn = ' '.join(args.data).replace(",", " ").split()
    else:
       rawDataInput = input("Enter raw data separated by spaces\n")
-      print(rawDataInput, type(rawDataInput))
       rawDataIn = rawDataInput.replace(",", " ").replace("  "," ").split()
-      print(rawDataIn, type(rawDataIn))
    
    if len(rawDataIn) < 4:
       print("Size of data is too small to proceed. Exiting")
@@ -141,11 +139,21 @@ Supported Structures are:
 
    dot = Digraph()
    dot.clear()
-   
    dot = processAndBuildData(struct,rawBytesData)
-   dot.render(fileName,format='png',view=args.render,cleanup=True)
+   
+   # Process to add a watermark :)
+   # dot.edge("head", "Watermark",style='invis')
+   # dot.node("Watermark","""<
+   #          <table BORDER='0'>
+   #             <tr>
+   #                <td align="left" colspan="55"> Made with xHCI-DataStructures-Visualizer          </td>
+   #                <td colspan="45">   <br></br> </td>
+   #                <td align="right"> github.com/thisisthedarshan/xHCI-DataStructures-Visualizer    </td>
+   #             </tr>
+   #          </table>
+   #          >""",shape='none')
+   dot.render(fileName,format='png',view=args.render,cleanup=False)
    addWatermark(fileName+".png")
-
   
 if __name__ == "__main__":
   xHCIDataStructureVisualizer()

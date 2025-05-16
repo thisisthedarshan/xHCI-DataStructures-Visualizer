@@ -46,11 +46,11 @@ def slotContextDetails(data:list[int]) -> str:
     <table border="1" cellborder="1" cellspacing="0" cellpadding="4">
         <tr>
             <td> Route String </td>
-            <td> | {bin(routeString[4])[2:]} | {bin(routeString[3])[2:]} | {bin(routeString[2])[2:]} | {bin(routeString[1])[2:]} | {bin(routeString[0])[2:]} | </td>
+            <td> {hex(routeString[0])} - {hex(routeString[1])} - {hex(routeString[2])} - {hex(routeString[3])} - {hex(routeString[4])} </td>
         </tr>
         <tr>
             <td> Targeted Downstream Port Number </td>
-            <td> {bin(routeString[0])[2:]} </td>
+            <td> {hex(routeString[4])} </td>
         </tr>
         <tr>
             <td> Speed </td>

@@ -21,8 +21,7 @@ def bytes2binList(dataBytesList:list[int]) -> list[int]:
     rows:list[int] = []
     for i in range(0,len(dataBytesList),4):
         intBytes = dataBytesList[i:i+4]
-        row = int.from_bytes(intBytes) # Here, the byteList is in Big-Endian order since we re-arrange it
-        print(row)
+        row = int.from_bytes(intBytes) # Here, the byteList is in Big-Endian order since we re-arrange it)
         rows.append(row)
     
     # We have the values. Split them in binary list items
@@ -33,7 +32,6 @@ def bytes2binList(dataBytesList:list[int]) -> list[int]:
         rawBinData.append(rawBinaryList)
 
     return rawBinData
-
 def addWatermark(image_path):
     """
     Adds a watermark to a PNG image by extending it from the bottom and adding text.

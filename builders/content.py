@@ -17,10 +17,10 @@ def slotContext(data:list[int]):
   rawBinData = bytes2binList(data)
   
   # Now split them according to rows and reverse-order them
-  row1 = rawBinData[0][::-1]
-  row2 = rawBinData[1][::-1]
-  row3 = rawBinData[2][::-1]
-  row4 = rawBinData[3][::-1]
+  row1 = rawBinData[0]
+  row2 = rawBinData[1]
+  row3 = rawBinData[2]
+  row4 = rawBinData[3]
   # Create a reserved segment
   reservedSegment32 = RsvdZ(32)
   
