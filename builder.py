@@ -15,7 +15,7 @@ from builders.details import *
 #########################################################################################
 # The following functions contain builders for individual data structures
 #########################################################################################
-def buildSlotContext(byteData:list[int], name:list[str] = []) -> str:
+def buildSlotContext(byteData:list[int]) -> str:
   '''
   This function builds visualization for slot context data structure
   '''
@@ -29,7 +29,7 @@ def buildSlotContext(byteData:list[int], name:list[str] = []) -> str:
   
   return createInfoTable("Slot Context",slotDiagram, slotDescription)
 
-def buildEndpointContext(byteData:list[int], endpointType:str = "", name:list[str] = []) -> str:
+def buildEndpointContext(byteData:list[int], endpointType:str = "") -> str:
   '''
   This function takes in raw bytes, decodes it and creates a visualization of 
   endpoint context data structure. Endpoint number = -1 indicates that we don't know which
@@ -46,12 +46,28 @@ def buildEndpointContext(byteData:list[int], endpointType:str = "", name:list[st
   return createInfoTable(f"Endpoint {endpointType}Context",endpointDiagram, endpointDescription)
 
 
+def buildInputControlContext(byteData:list[int]) -> str:
+  '''
+  This function takes in raw bytes, decodes it and creates a visualization of 
+  input control context data structure.
+  '''
+  
+  if len(byteData) < 32:
+    raise VisualizationException(f"Expecting 32 bytes of data. Got {len(byteData)} bytes")
+
+  # Get the content
+  inputCtrlCtxData = inputControlContextContext(byteData)
+  inputCtrlCtxDataDescription = inputControlContextContextDetails(byteData)
+  
+  return createInfoTable(f"Input Control Context",inputCtrlCtxData, inputCtrlCtxDataDescription)
+
+
 #########################################################################################
 # The following functions contain logic for building chained/grouped data structures 
 # containing more than 1 data structure
 #########################################################################################
 
-def buildDeviceContext(byteData:list[int]) -> Digraph:
+def buildDeviceContext(byteData:list[int], name:str="head", names:list[str]=[]) -> dict[str,str]:
   '''
   This function takes in raw data, processes it and builds a complex visualization of the 
   device context data structure.
@@ -63,23 +79,19 @@ def buildDeviceContext(byteData:list[int]) -> Digraph:
   if len(byteData) < 1024:
     raise VisualizationException(f"Device Context expects al-least 1024 bytes as input. Got {len(byteData)} bytes instead")
   
+  # Create a list of dict to be returned
+  deviceContextDS:dict[str,str] = {}
+  
   # First split into slot data segment and endpoints data segment
   slotSegment:list[int] = byteData[:32] # 4 bytes per row * 8 rows
   endpointSegments:list[int] = byteData[32:] # Remaining Bytes will be for endpoint context
   
-  # Create digraph item
-  dot = Digraph()
-  dot.clear()
-  
-  # Create a list to hold unique object names so that we can use it in mapping of contexts in graph
-  name:list[str] = []
-  
   # Build Slot Context
-  slotContext = buildSlotContext(slotSegment,name)
+  slotContext = buildSlotContext(slotSegment)
   
-  name.append(f"head")
+  names.append(name)
   
-  dot.node(name[-1],slotContext, shape='none')
+  deviceContextDS[names[-1]] = slotContext
   
   # Build The Endpoint Contexts
   for endpointNumber in range(31):
@@ -89,20 +101,57 @@ def buildDeviceContext(byteData:list[int]) -> Digraph:
     else:
       endpointType = f"{(endpointNumber//2)+(endpointNumber % 2)} {"- OUT" if endpointNumber % 2 == 1 else "- IN"} "
     
-    name.append(f"Endpoint Context {endpointType}")
+    name = f"Endpoint Context {endpointType}"
+    names.append(name)
     endpointSegment = endpointSegments[(endpointNumber*32) : (endpointNumber+1)*32]
-    dot.node(name[-1],buildEndpointContext(endpointSegment,endpointType,name), shape='none')
+    deviceContextDS[names[-1]] = buildEndpointContext(endpointSegment,endpointType)
 
-  for i in range(len(name)-1):
-    dot.edge(name[i], name[i+1])
-      
-  return dot
+  return deviceContextDS
+
+def buildInputContext(byteData:list[int], name:str="head", names:list[str] = []) -> Digraph:
+  '''
+  This function takes in raw bytes and builds input context data structure.
+  Input Context Data Structure is nothing but a combination if Input Control Context
+  and the Device Context Data Structures.
+  '''
+
+  # Ensure that teh input byte list is of at-least 1056 bytes
+  # This is because
+  # Input Control Context = 32 bytes
+  # Slot Context = 32 bytes
+  # Endpoint Contexts = 992 bytes (32 endpoints * 32 bytes each)
+  
+  if len(byteData) < 1056:
+    raise VisualizationException(f"Input Context Expects at-least 1056 bytes of data. Currently, we have {len(byteData)} bytes of data")
+  
+  # Safe to continue
+  
+  ds:dict[str, str] = {} # This dictionary holds our Data Structures
+
+  # Separate data for input control context and device context
+  inputControlCtxData = byteData[:32]
+  deviceCtxData = byteData[32:]
+  
+  # First build Input Control Context Data Structure
+  inputCtrlCtx = buildInputControlContext(inputControlCtxData)
+  
+  # Put data into dictionary
+  ds[name] = inputCtrlCtx
+  names.append(name)
+  
+  # Build Device Context Data
+  deviceCtx = buildDeviceContext(deviceCtxData, "Slot Context", names)
+
+  # Merge both
+  ds.update(deviceCtx)
+
+  return ds
 
 #########################################################################################
 # The following functions contain logic to decode inputs and call appropriate builders
 #########################################################################################
 
-def createStandaloneDS(byteData:list[int], struct:str) -> Digraph:
+def createStandaloneDS(byteData:list[int], struct:str, names:list[str] = []) -> Digraph:
   '''
   This function helps visualize individual data structures instead of
   grouped data structures
@@ -113,6 +162,8 @@ def createStandaloneDS(byteData:list[int], struct:str) -> Digraph:
       content =  buildSlotContext(byteData)
     case "endpctx":
       content =  buildEndpointContext(byteData)
+    case "icctx":
+      content = buildInputControlContext(byteData)
     case _:
       raise VisualizationException(f"Invalid Data Structure codename {struct}")
 
@@ -120,20 +171,11 @@ def createStandaloneDS(byteData:list[int], struct:str) -> Digraph:
   dot = Digraph()
   dot.clear()
   
-  dot.node(f"head",content,shape='none')
+  names.append("head")
+  dot.node(names[-1], content, shape='none')
   return dot
-  
-def createDeviceContextDS(byteData:list[int]) -> str:
-  '''
-  This function takes in raw data and returns a GraphViz object representing
-  the complete Device Context Data Structure
-  '''
-  # Ensure that the byteData is at-least 256-bytes 
-  if len(byteData) < 256:
-    raise VisualizationException("Size of the data for Device Context is invalid")
 
-
-def processAndBuildData(struct:str, byteData:list[int]) -> Digraph:
+def processAndBuildData(struct:str, byteData:list[int], names:list[str]=[]) -> Digraph:
   '''
   This function is responsible for processing input and selecting data structure
   to create the final visuals. The function can process individual data structures
@@ -141,15 +183,29 @@ def processAndBuildData(struct:str, byteData:list[int]) -> Digraph:
   like Device Context Data Structure, Input Context Data Structure etc.
   '''
   
-  dot = Digraph()
-  dot.clear()
-  result = ""
+  result:dict[str,str] = {}
+      
   match struct:
     case "devctx":
-      return buildDeviceContext(byteData)
+      result = buildDeviceContext(byteData, names=names)
     case "ipctx":
-      pass
+      result = buildInputContext(byteData, names=names)
     case _:
-        # Creates standalone data structures 
-        return createStandaloneDS(byteData,struct)
+        # Creates standalone data structures and directly return them
+        return createStandaloneDS(byteData, struct, names)
+      
+  dot = Digraph()
+  dot.clear()
+  
+  # Build all nodes
+  for name, content in result.items():
+    # Create nodes
+    dot.node(name, content, shape='none')
+  
+  # Connect them
+  names = list(result.keys())
+  for i in range(len(names)-1):
+    # Connect them
+    dot.edge(names[i], names[i+1])
 
+  return dot

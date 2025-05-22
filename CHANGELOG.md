@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Ability to export as pdf using --pdf
+- Ability to visualize Input Control Context
+- Ability to visualize Input Context
 
 ## [1.0.0] - 2025-05-16
 

@@ -200,6 +200,62 @@ def endpointContextDetails(data:list[int]) ->str:
         </tr>
         
     </table>
-
 """
 
+
+def inputControlContextContextDetails(data:list[int]):
+    '''
+    This function details the input control context data structure
+    '''
+    
+    dropFlagsBin = bin(int.from_bytes(data[:4]))[2:].zfill(32)[:-1] # First 4 bytes make the 1st row
+    addFlagsBin = bin(int.from_bytes(data[4:8]))[2:].zfill(32)[:-1] # Next 4 bytes make the 2nd row
+    
+    
+    dropFlags = "Dropping Endpoint Context : " if '1' in dropFlagsBin else "Not dropping any endpoint contexts."
+    addFlags = "" if '1' in addFlagsBin else "Not Adding/Evaluating any context"
+    
+    # Create info on Drop Flags
+    for flagNumber, dropFlag in enumerate(dropFlagsBin):
+        if int(dropFlag) == 1:
+            dropFlags += f"{flagNumber}; "
+            
+    # Create info on Add/Evaluate Flags
+    for flagNumber, addFlag in enumerate(addFlagsBin):
+        if flagNumber == 1:
+            endpointType = "0 - Bi-Directional "
+        elif flagNumber > 2:
+            endpointType = f"{((flagNumber-1)//2)+((flagNumber-1) % 2)} {"- OUT" if (flagNumber-1) % 2 == 1 else "- IN"} "
+        contextName = "Slot" if flagNumber == 0 else f"Endpoint {endpointType}"
+        if int(addFlag) == 1:
+            addFlags += f"Evaluating {contextName} Context. "
+    
+    configurationValue = f"If CIC and CIE are 1 and it's a Configure Endpoint Command, use the config value <b>(bConfigurationValue) = {data[31]}</b>; otherwise, set to 0."
+    interfaceNumber = f"If CIC and CIE are both 1, and this Input Context is part of a Configure Endpoint Command triggered by a SET_INTERFACE request, then this field holds the interface number <b>(bInterfaceNumber) = {data[30]}</b> from the standard interface descriptor. If not, the field is set to 0."
+    alternateSetting = f"If CIC and CIE are 1, and this is a Configure Endpoint Command caused by a SET_INTERFACE request, then this field holds the alternate setting <b>(bAlternateSetting) = {data[29]}</b> value from the interface descriptor. Otherwise, it's set to 0."
+    
+    return f"""
+    <table border="1" cellborder="1" cellspacing="0" cellpadding="4">
+        <tr>
+            <td> Drop Context flags </td>
+            <td> {dropFlags} </td>
+        </tr>
+        <tr>
+            <td> Add Context flags </td>
+            <td> {addFlags} </td>
+        </tr>
+        <tr>
+            <td> Configuration Value </td>
+            <td> {configurationValue} </td>
+        </tr>
+        <tr>
+            <td> Interface Number </td>
+            <td> {interfaceNumber} </td>
+        </tr>
+        <tr>
+            <td> Alternate Setting </td>
+            <td> {alternateSetting} </td>
+        </tr>
+    </table>
+
+"""

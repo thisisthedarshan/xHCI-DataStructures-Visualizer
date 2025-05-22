@@ -17,6 +17,7 @@ descriptionWidth = 24
 supportedStructures:dict[str, str] = {
     "slotctx "    : "Slot Context",
     "endpctx "    : "Endpoint Context",
+    "icctx"       : "Input Control Context",
     "devctx "     : "Device Context",
     "ipctx "      : "Input Context",
 }

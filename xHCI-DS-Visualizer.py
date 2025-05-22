@@ -13,7 +13,7 @@ import textwrap
 from graphviz import Digraph
 
 from builder import processAndBuildData
-from helpers import addWatermark, convert32BitToBytesArray
+from helpers import addWatermark, addWatermarkDot, convert32BitToBytesArray
 from builders.constants import supportedStructures, codenameWidth, descriptionWidth
 
 def xHCIDataStructureVisualizer():
@@ -136,22 +136,17 @@ Supported Structures are:
       print(f"Invalid Struct option {struct}.")
       sys.exit(-81)
       
-   print(f"Selected option : {struct}")
+   print(f"Selected option : {supportedStructures.get(struct,"")} ({struct})")
+
+   names:list[str] = []
 
    dot = Digraph()
    dot.clear()
-   dot = processAndBuildData(struct,rawBytesData)
+   dot = processAndBuildData(struct, rawBytesData, names)
    
    if args.pdf:
       # Process to add a watermark :)
-      dot.edge("head", "Watermark",style='invis')
-      dot.node("Watermark","""<
-               <table BORDER='0'>
-                  <tr>
-                     <td HREF="https://github.com/thisisthedarshan/xHCI-DataStructures-Visualizer" TARGET="_blank"> Made with xHCI-DataStructures-Visualizer :D </td>
-                  </tr>
-               </table>
-               >""",shape='none')
+      addWatermarkDot(dot, names)
       dot.render(fileName,format='pdf',view=args.render,cleanup=True)
    else:
       dot.render(fileName,format='png',view=args.render,cleanup=True)

@@ -70,6 +70,7 @@ Run the tool with data or a file to visualize xHCI structures.
 | Input Context Data Structure          |  `ipctx`     |
 | Slot Context                          |  `slotctx`   |
 | Endpoint Context                      |  `endpctx`   |
+| Input Control Context                 |  `icctx`     |
 
 ## Flags and their usages
 

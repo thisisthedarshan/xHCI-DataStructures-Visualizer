@@ -6,6 +6,7 @@
 # This file contains helper functions
 
 from PIL import Image, ImageFont, ImageDraw
+from graphviz import Digraph
 
 def convert32BitToBytesArray(dataIn32BitForm:list[int]) -> list[int]:
   '''This function Converts 32-bit int array to an array of bytes'''
@@ -32,6 +33,7 @@ def bytes2binList(dataBytesList:list[int]) -> list[int]:
         rawBinData.append(rawBinaryList)
 
     return rawBinData
+
 def addWatermark(image_path):
     """
     Adds a watermark to a PNG image by extending it from the bottom and adding text.
@@ -117,3 +119,24 @@ def addWatermark(image_path):
     # Save over original file
     new_img.save(image_path)
     
+
+def addWatermarkDot(dot:Digraph, names:list[str]):
+    '''
+    This function adds watermark to the dot object
+    '''
+    dot.edge("Watermark","head", style='invis')     # Add watermark at start
+    dot.node("Watermark","""<
+             <table BORDER='0'>
+                <tr>
+                   <td HREF="https://github.com/thisisthedarshan/xHCI-DataStructures-Visualizer" TARGET="_blank"> Made with xHCI-DataStructures-Visualizer :D </td>
+                </tr>
+             </table>
+             >""",shape='none', fontsize="21")
+    dot.edge(names[-1], "Watermark-End", style='invis') # Add watermark at end
+    dot.node("Watermark-End","""<
+             <table BORDER='0'>
+                <tr>
+                   <td HREF="https://github.com/thisisthedarshan/xHCI-DataStructures-Visualizer" TARGET="_blank"> Made with xHCI-DataStructures-Visualizer :D </td>
+                </tr>
+             </table>
+             >""",shape='none', fontsize="21")

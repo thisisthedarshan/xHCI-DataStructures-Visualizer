@@ -205,3 +205,149 @@ def endpointContext(data:list[int]):
     </tr>
 </table>
 """
+
+def inputControlContextContext(data:list[int]):
+    '''This function creates an input control context data structure '''
+    
+    rawBinData = bytes2binList(data)
+  
+    # Now split them according to rows and reverse-order them
+    row1 = rawBinData[0][::-1]
+    row2 = rawBinData[1][::-1]
+    row8 = rawBinData[7][::-1]
+    
+    # Create a reserved segment
+    reservedSegment32 = RsvdZ(32)
+  
+    return f"""
+<table border="1" cellborder="1" cellspacing="0" cellpadding="4">
+    <!-- Row 0: Bits -->
+    <tr>
+        {''.join(f'<td colspan="4"><b>{format(i,"02")}</b></td>\n' for i in reversed(range(32)))}
+    </tr>
+    
+    <!-- Row 1-->
+    <tr>
+        <td colspan="4"><b>D31</b></td>
+        <td colspan="4"><b>D30</b></td>
+        <td colspan="4"><b>D29</b></td>
+        <td colspan="4"><b>D28</b></td>
+        <td colspan="4"><b>D27</b></td>
+        <td colspan="4"><b>D26</b></td>
+        <td colspan="4"><b>D25</b></td>
+        <td colspan="4"><b>D24</b></td>
+        <td colspan="4"><b>D23</b></td>
+        <td colspan="4"><b>D22</b></td>
+        <td colspan="4"><b>D21</b></td>
+        <td colspan="4"><b>D20</b></td>
+        <td colspan="4"><b>D19</b></td>
+        <td colspan="4"><b>D18</b></td>
+        <td colspan="4"><b>D17</b></td>
+        <td colspan="4"><b>D16</b></td>
+        <td colspan="4"><b>D15</b></td>
+        <td colspan="4"><b>D14</b></td>
+        <td colspan="4"><b>D13</b></td>
+        <td colspan="4"><b>D12</b></td>
+        <td colspan="4"><b>D11</b></td>
+        <td colspan="4"><b>D10</b></td>
+        <td colspan="4"><b>D9</b></td>
+        <td colspan="4"><b>D8</b></td>
+        <td colspan="4"><b>D7</b></td>
+        <td colspan="4"><b>D6</b></td>
+        <td colspan="4"><b>D5</b></td>
+        <td colspan="4"><b>D4</b></td>
+        <td colspan="4"><b>D3</b></td>
+        <td colspan="4"><b>D2</b></td>
+        <td colspan="8"><b>RsvdZ</b></td>
+        <td><b>03-00H</b></td>
+    </tr>
+    <tr>
+        {''.join(f'<td colspan="4">{bit}</td>' for bit in row1)}
+        <td>—</td>
+    </tr>
+    
+    <!-- Row 2 -->
+    <tr>
+        <td colspan="4"><b>A31</b></td>
+        <td colspan="4"><b>A30</b></td>
+        <td colspan="4"><b>A29</b></td>
+        <td colspan="4"><b>A28</b></td>
+        <td colspan="4"><b>A27</b></td>
+        <td colspan="4"><b>A26</b></td>
+        <td colspan="4"><b>A25</b></td>
+        <td colspan="4"><b>A24</b></td>
+        <td colspan="4"><b>A23</b></td>
+        <td colspan="4"><b>A22</b></td>
+        <td colspan="4"><b>A21</b></td>
+        <td colspan="4"><b>A20</b></td>
+        <td colspan="4"><b>A19</b></td>
+        <td colspan="4"><b>A18</b></td>
+        <td colspan="4"><b>A17</b></td>
+        <td colspan="4"><b>A16</b></td>
+        <td colspan="4"><b>A15</b></td>
+        <td colspan="4"><b>A14</b></td>
+        <td colspan="4"><b>A13</b></td>
+        <td colspan="4"><b>A12</b></td>
+        <td colspan="4"><b>A11</b></td>
+        <td colspan="4"><b>A10</b></td>
+        <td colspan="4"><b>A9</b></td>
+        <td colspan="4"><b>A8</b></td>
+        <td colspan="4"><b>A7</b></td>
+        <td colspan="4"><b>A6</b></td>
+        <td colspan="4"><b>A5</b></td>
+        <td colspan="4"><b>A4</b></td>
+        <td colspan="4"><b>A3</b></td>
+        <td colspan="4"><b>A2</b></td>
+        <td colspan="4"><b>A1</b></td>
+        <td colspan="4"><b>A0</b></td>
+        <td><b>07-04H</b></td>
+    </tr>
+    <tr>
+        {''.join(f'<td colspan="4">{bit}</td>' for bit in row2)}
+        <td>—</td>
+    </tr>
+    
+    <!-- Row 3 -->
+    <tr>
+        <td colspan="128">{reservedSegment32}</td>
+        <td><b>1B-18H</b></td>
+    </tr>
+    
+    <!-- Row 4 -->
+    <tr>
+        <td colspan="128">{reservedSegment32}</td>
+        <td><b>1B-18H</b></td>
+    </tr>
+    
+    <!-- Row 5 -->
+    <tr>
+        <td colspan="128">{reservedSegment32}</td>
+        <td><b>1B-18H</b></td>
+    </tr>
+    
+    <!-- Row 6 -->
+    <tr>
+        <td colspan="128">{reservedSegment32}</td>
+        <td><b>17-14H</b></td>
+    </tr>
+    
+    <!-- Row 7 -->
+    <tr>
+        <td colspan="128">{reservedSegment32}</td>
+        <td><b>1B-18H</b></td>
+    </tr>
+    
+    <!-- Row 8 -->
+    <tr>
+        <td colspan="32"><b>Configuration Value</b></td>
+        <td colspan="32"><b>Interface Number</b></td>
+        <td colspan="32"><b>Alternate Setting</b></td>
+        <td colspan="32"><b>RsvdZ</b></td>
+        <td><b>1F-1CH</b></td>
+    </tr>
+    <tr>
+        {''.join(f'<td colspan="4">{bit}</td>' for bit in row8)}
+        <td>—</td>
+    </tr>
+</table>
+"""
